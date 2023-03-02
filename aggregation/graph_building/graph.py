@@ -152,3 +152,6 @@ class RuanGraph(AbstractGraph):
             return None
 
         return [(tag, self.get_node_by_nodetag(tag) for tag in self.list_node_tags if self.A[node_tag][tag] != 0)]
+
+    def uncolored_nodes(self) -> List[str]:
+        return [node_tag for node_tag in self.list_node_tags if self.get_node_by_nodetag(node_tag).color is None]

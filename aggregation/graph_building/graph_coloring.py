@@ -4,7 +4,7 @@ import numpy as np
 import networkx as nx
 
 import tqdm as tqdm
-from aggregation.graph_building.graph import AbstractGraph
+from aggregation.graph_building.graph import RuanGraph
 from extraction import Tube
 
 """
@@ -75,7 +75,6 @@ class SaturationCache:
         if node_tag in self.s_pc:
             return self.s_pc[node_tag]
         tube_tag, frame_id = node_tag.split(".")
-        tube = self.graph.nodes[tube_tag][frame_id].tube
         num_node_same_tubes = len(self.graph.nodes[tube_tag].keys())
         self.s_pc[node_tag] = num_node_same_tubes / self.num_nodes
 
@@ -102,14 +101,80 @@ class SaturationCache:
         """
         return self.cal_sd(node_tag) + self.cal_sl(node_tag) + self.cal_spc(node_tag) + self.cal_sapp(node_tag)
 
-    def nodes_saturation(self):
+    def nodes_saturation(self, node_tags):
         """
-        Calculate the degree of saturation for all the nodes in the graph
+        Calculate the degree of saturation for all the nodes in the list node
         """
-        return {node_tag: self.saturation(node_tag) for node_tag in self.graph.list_node_tags}
+        return {node_tag: self.saturation(node_tag) for node_tag in node_tags}
 
 
 class GraphColoration:
-    def __init__(self, graph, q):
-        self.graph = graph  # graph
+    def __init__(self, graph: RuanGraph, q):
+        self.saturation_cache = SaturationCache(graph)
+        self.graph = graph
         self.q = q
+
+    def q_far_apart(self, proposed_color, node_tag):
+        """
+        This condition imposes that all the nodes connected by an edge weight 1
+        to the node referenced must be at least q far apart
+        """
+        adjacent_nodes = self.graph.get_adjacent_nodes(node_tag)
+        for tag, node in adjacent_nodes:
+            if self.graph.A[node_tag][tag] != 1:
+                continue
+            if node.color is None:
+                continue
+            if np.abs(node.color - proposed_color) <= self.q:
+                return False
+        return True
+
+    # def does_not_overlap(self, proposed_color, nodekey):
+    #     """
+    #     Condition 2 in He et al. 2017 paper which imposed a strict rule to avoid collisions
+    #     However, Ruan et al. 2019 not define the Overlapping relation so this is unnecessary
+    #     """
+    #     if pcg.generated_by_intersection(nodekey) or pcg.isolated_main_node(nodekey):
+    #         return True
+    #     vi, vj, vip, vjp = pcg.identify_quatern(nodekey)
+    #     vi, vj, vip, vjp = pcg.node(vi), pcg.node(vj), pcg.node(vip), pcg.node(vjp)
+    #     if vip.color is None or vjp.color is None: return True
+    #     tij = vj.frame - vi.frame
+    #     return (proposed_color - vip.color) * (proposed_color + tij - vjp.color) > 0
+
+    def ssort(self, nodes_saturation):
+        """
+        This function sorts the nodes in decreasing order by their degree of saturation.
+        The appearance time is used to break ties.
+        """
+        app = lambda node_tag: self.graph.get_node_by_nodetag(node_tag).tube.sframe
+        order_list = [(node_tag, saturation, app(node_tag)) for node_tag, saturation in nodes_saturation]
+        order_list.sort(key=lambda x: (x[1], x[2]), reverse=True)
+
+        return [node_tag for node_tag, saturation, appearance in order_list]
+
+    def color_graph(self):
+        """
+        Implements the graph coloring algorithm introduced by He et al. 2017
+        """
+        color = 1
+        self.graph.clean_colors()
+        pbar = tqdm(total=len(self.graph.list_node_tags))
+
+        while len(self.graph.uncolored_nodes()) > 0:
+            nodes_not_colored = self.graph.uncolored_nodes()
+            nodes_saturation = self.saturation_cache.nodes_saturation(nodes_not_colored)
+
+            order_list = self.ssort(nodes_saturation)
+            nodes_saturation = self.saturation_cache.nodes_saturation(nodes_not_colored)
+
+            for node_tag in order_list:
+                if self.graph.get_node_by_nodetag(node_tag).color is not None:
+                    continue
+                if self.q_far_apart(color, node_tag):
+                    self.graph.get_node_by_nodetag(node_tag).color = color
+                    pbar.update(1)
+
+
+
+
