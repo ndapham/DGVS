@@ -30,8 +30,8 @@ from yolov5.utils.general import scale_boxes as scale_coords
 
 from yolov5.utils.torch_utils import select_device, time_sync
 from yolov5.utils.plots import Annotator, colors, save_one_box
-from pcgvs.extraction.strong_sort.utils.parser import get_config
-from pcgvs.extraction.strong_sort import StrongSORT
+from extraction.strong_sort.utils.parser import get_config
+from extraction.strong_sort import StrongSORT
 
 # remove duplicated stream handler to avoid duplicated logging
 try:

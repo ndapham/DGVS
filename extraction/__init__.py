@@ -1,15 +1,13 @@
 import os
+from os import path
 import sys
+from tqdm import tqdm
 import shutil
-# import numpy as np
+
 import pandas as pd
 import cv2
 
-from tqdm import tqdm
-from os import path
-from pathlib import Path
-from pcgvs.extraction.track import run
-from pcgvs.utils import get_video_nframes, get_video_duration
+from extraction.track import run
 
 
 class Tube:
@@ -36,7 +34,7 @@ class Tube:
 
     def get_bounding_box_at_frame(self, frame):
         i = frame - self.sframe
-        return (self.bbX[i], self.bbY[i], self.bbW[i], self.bbH[i])
+        return self.bbX[i], self.bbY[i], self.bbW[i], self.bbH[i]
 
     def __iter__(self):
         self.iteridx = 0

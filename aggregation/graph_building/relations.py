@@ -1,20 +1,19 @@
 from abc import ABC
 from itertools import permutations
-import torch
 
 
 class AbstractRelations(ABC):
     def __init__(self, tubes):
         self.tubes = tubes
-        self.relations = {}
+        self.relations_dict = {}
         self._fill_with_irrelevant_relations()
         self.compute_relations()
 
     def _fill_with_irrelevant_relations(self):
         for Ta in self.tubes:
-            self.relations[Ta.tag] = {}
+            self.relations_dict[Ta.tag] = {}
             for Tb in self.tubes:
-                self.relations[Ta.tag][Tb.tag] = None
+                self.relations_dict[Ta.tag][Tb.tag] = None
 
     def compute_relations(self):
         raise Exception("Using default compute relations function")
@@ -48,15 +47,16 @@ class RuanRelationsMap(AbstractRelations):
                     if self._frame_intersect(a_data, b_data):
                         src_frame = a_data[4]  # a_data: x, y, w, h, frame_id
                         trg_frame = b_data[4]  # b_data: x, y, w, h, frame_id
-                        if self.relations[Ta.tag][Tb.tab] is None:
-                            self.relations[Ta.tag][Tb.tag] = []
-                        self.relations[Ta.tag][Tb.tag].append((src_frame, trg_frame))
+                        if self.relations_dict[Ta.tag][Tb.tab] is None:
+                            self.relations_dict[Ta.tag][Tb.tag] = []
+                        self.relations_dict[Ta.tag][Tb.tag].append((src_frame, trg_frame))
 
             #  Utilize computed relations
-            if self.relations[Tb.tag][Ta.tag] is not None:
-                self.relations[Ta.tag][Tb.tag] = [(item[1], item[0]) for item in self.relations[Ta.tag][Tb.tag]]
+            if self.relations_dict[Tb.tag][Ta.tag] is not None:
+                self.relations_dict[Ta.tag][Tb.tag] = [(item[1], item[0]) for item in self.relations_dict[Tb.tag][Ta.tag]]
 
-    def _frame_intersect(self, src_frame_data, trg_frame_data):
+    @staticmethod
+    def _frame_intersect(src_frame_data, trg_frame_data):
         src_x, src_y, src_w, src_h, _ = src_frame_data
         trg_x, trg_y, trg_w, trg_h, _ = trg_frame_data
 
@@ -67,7 +67,9 @@ class RuanRelationsMap(AbstractRelations):
         trg_top_left_x, trg_top_left_y = trg_x, trg_y
         trg_bottom_right_x, trg_bottom_right_y = trg_x + trg_w, trg_y + trg_h
 
-        condition1 = src_top_left_y - tr
+        condition1 = (src_top_left_y - trg_bottom_right_y) * (src_bottom_right_y - trg_top_left_y) < 0
+        condition2 = (src_top_left_x - trg_bottom_right_x) * (src_bottom_right_x - trg_top_left_x) < 0
+        return condition1 and condition2
 
     # Compute relations among tubes using tensors
     def compute_relations_by_matrix(self):
