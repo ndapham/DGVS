@@ -207,4 +207,4 @@ class GraphColoration:
         li = {}
         for tube in self.graph.tubes:
             optim = lambda node: node.color - (node.frame - tube.sframe)
-            
+
