@@ -172,9 +172,39 @@ class GraphColoration:
                 if self.graph.get_node_by_nodetag(node_tag).color is not None:
                     continue
                 if self.q_far_apart(color, node_tag):
+                    # Verbose =======================
+                    print(f"Coloring the node: {node_tag} to color: {color}")
+                    # Verbose =======================
+
                     self.graph.get_node_by_nodetag(node_tag).color = color
                     pbar.update(1)
 
+                    # Color all the node in the same tube
+                    tube_tag, frame_id = node_tag.split(".")
 
+                    for same_tube_frame_id, same_tube_node in self.graph.nodes[tube_tag].items():
+                        same_tube_node.color = color + int(same_tube_frame_id) - int(frame_id)
+                        # Verbose =======================
+                        print(f"Coloring in the same tube - id: {same_tube_frame_id} to color: {same_tube_node.color}")
+                        # Verbose =======================
 
+                        pbar.update(1)
 
+        pbar.close()
+        return self.graph
+
+    # def starting_nodes_or_intersections(self):
+    #     """
+    #     Utility function to retrieve only the starting nodes
+    #     """
+
+    def tube_starting_time(self):
+        """
+        Partially use Allegra Et al. optimization of the
+        algorithm to calculate the starting time for the tubes,
+        once the graph is colored.
+        """
+        li = {}
+        for tube in self.graph.tubes:
+            optim = lambda node: node.color - (node.frame - tube.sframe)
+            
