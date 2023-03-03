@@ -6,11 +6,11 @@ from aggregation.graph_building.graph import AbstractGraph
 
 
 class AbstractDynamicGraph(ABC):
-    def __init__(self):
-        self.graph = None  # graph of activity tubes
-        self.h = None  # tolerance of collision
+    def __init__(self, graph, h, p):
+        self.graph = graph  # graph of activity tubes
+        self.h = h  # tolerance of collision
         self.number_of_collisions = list()  # list of number collision at each time location
-        self.p = None   # Upper bound of the maximum tube number in dynamic graph
+        self.p = p   # Upper bound of the maximum tube number in dynamic graph
 
     def updating(self, new_tube, c_min) -> AbstractGraph:
         raise Exception("Using function for updating the graph buffer in the abstract class")

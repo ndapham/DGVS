@@ -157,7 +157,7 @@ class GraphColoration:
         """
         Implements the graph coloring algorithm introduced by He et al. 2017
         """
-        color = 1
+        color: int = 1
         self.graph.clean_colors()
         pbar = tqdm(total=len(self.graph.list_node_tags))
 
@@ -166,7 +166,7 @@ class GraphColoration:
             nodes_saturation = self.saturation_cache.nodes_saturation(nodes_not_colored)
 
             order_list = self.ssort(nodes_saturation)
-            nodes_saturation = self.saturation_cache.nodes_saturation(nodes_not_colored)
+            # nodes_saturation = self.saturation_cache.nodes_saturation(nodes_not_colored)
 
             for node_tag in order_list:
                 if self.graph.get_node_by_nodetag(node_tag).color is not None:
@@ -189,7 +189,7 @@ class GraphColoration:
                         # Verbose =======================
 
                         pbar.update(1)
-
+            color += 1
         pbar.close()
         return self.graph
 
@@ -207,4 +207,33 @@ class GraphColoration:
         li = {}
         for tube in self.graph.tubes:
             optim = lambda node: node.color - (node.frame - tube.sframe)
+            nodes = self.graph.nodes[tube.tag].values()
+            if len(nodes) == 1 and nodes[0].tag.endswith("isolated"):
+                # this tube is isolated so put it in the first frame of the video
+                li[tube.tag] = 1
+            else:
+                li[tube.tag] = max(1, min([optim(node) for node in nodes]))
 
+        G = nx.Graph()
+        G.add_nodes_from([tube.tag for tube in self.graph.tubes])
+
+        edges = set()
+        for k1 in self.graph.list_node_tags:
+            v1 = self.graph.get_node_by_nodetag(k1)
+            for k2 in self.graph.list_node_tags:
+                v2 = self.graph.get_node_by_nodetag(k2)
+                if self.graph.A[k1][k2] == 0 or v1.tube.tag == v2.tube.tag:
+                    continue
+
+                edges.add((v1.tube.tag, v2.tube.tag))
+
+        starting_time = {}
+
+        for Ck in nx.connected_components(G):
+            tmp = sorted(li.items(), key=lambda item: item[1])
+            Ck_ordered = {k: v for k, v in tmp if k in Ck}
+            l1 = min([l for tag, l in li.items() if tag in Ck])
+            for i, tag in enumerate(Ck_ordered):
+                starting_time[tag] = l1 + (self.q * i)
+
+        return starting_time

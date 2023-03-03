@@ -73,7 +73,8 @@ class RuanGraph(AbstractGraph):
 
             # If a tube is isolated, i create a node for its first frame
             if self.check_isolated_node(tube_relations):
-                self.nodes[str(tube.tag)][str(0)] = Node(tube.tag, tube)
+                node_tag = f"{tube.tag}-isolated"
+                self.nodes[str(tube.tag)][str(0)] = Node(node_tag, tube)
                 continue
 
             # If the tube collide with some other tubes, i build nodes for frame that witness the collisions
