@@ -109,19 +109,18 @@ class SaturationCache:
 
 
 class GraphColoration:
-    def __init__(self, graph: RuanGraph, q):
-        self.saturation_cache = SaturationCache(graph)
-        self.graph = graph
+    def __init__(self, q):
+        self.saturation_cache = None
         self.q = q
 
-    def q_far_apart(self, proposed_color, node_tag):
+    def q_far_apart(self, graph: RuanGraph, proposed_color, node_tag):
         """
         This condition imposes that all the nodes connected by an edge weight 1
         to the node referenced must be at least q far apart
         """
-        adjacent_nodes = self.graph.get_adjacent_nodes(node_tag)
+        adjacent_nodes = graph.get_adjacent_nodes(node_tag)
         for tag, node in adjacent_nodes:
-            if self.graph.A[node_tag][tag] != 1:
+            if graph.A[node_tag][tag] != 1:
                 continue
             if node.color is None:
                 continue
@@ -142,47 +141,48 @@ class GraphColoration:
     #     tij = vj.frame - vi.frame
     #     return (proposed_color - vip.color) * (proposed_color + tij - vjp.color) > 0
 
-    def ssort(self, nodes_saturation):
+    def ssort(self, graph: RuanGraph, nodes_saturation):
         """
         This function sorts the nodes in decreasing order by their degree of saturation.
         The appearance time is used to break ties.
         """
-        app = lambda node_tag: self.graph.get_node_by_nodetag(node_tag).tube.sframe
-        order_list = [(node_tag, saturation, app(node_tag)) for node_tag, saturation in nodes_saturation]
+        get_appearance = lambda node_tag: graph.get_node_by_nodetag(node_tag).tube.sframe
+        order_list = [(node_tag, saturation, get_appearance(node_tag)) for node_tag, saturation in nodes_saturation]
         order_list.sort(key=lambda x: (x[1], x[2]), reverse=True)
 
         return [node_tag for node_tag, saturation, appearance in order_list]
 
-    def color_graph(self):
+    def color_graph(self, graph: RuanGraph):
         """
         Implements the graph coloring algorithm introduced by He et al. 2017
         """
         color: int = 1
-        self.graph.clean_colors()
+        self.saturation_cache = SaturationCache(graph)
+        graph.clean_colors()
         pbar = tqdm(total=len(self.graph.list_node_tags))
 
-        while len(self.graph.uncolored_nodes()) > 0:
-            nodes_not_colored = self.graph.uncolored_nodes()
+        while len(graph.uncolored_nodes()) > 0:
+            nodes_not_colored = graph.uncolored_nodes()
             nodes_saturation = self.saturation_cache.nodes_saturation(nodes_not_colored)
 
             order_list = self.ssort(nodes_saturation)
             # nodes_saturation = self.saturation_cache.nodes_saturation(nodes_not_colored)
 
             for node_tag in order_list:
-                if self.graph.get_node_by_nodetag(node_tag).color is not None:
+                if graph.get_node_by_nodetag(node_tag).color is not None:
                     continue
                 if self.q_far_apart(color, node_tag):
                     # Verbose =======================
                     print(f"Coloring the node: {node_tag} to color: {color}")
                     # Verbose =======================
 
-                    self.graph.get_node_by_nodetag(node_tag).color = color
+                    graph.get_node_by_nodetag(node_tag).color = color
                     pbar.update(1)
 
                     # Color all the node in the same tube
                     tube_tag, frame_id = node_tag.split(".")
 
-                    for same_tube_frame_id, same_tube_node in self.graph.nodes[tube_tag].items():
+                    for same_tube_frame_id, same_tube_node in graph.nodes[tube_tag].items():
                         same_tube_node.color = color + int(same_tube_frame_id) - int(frame_id)
                         # Verbose =======================
                         print(f"Coloring in the same tube - id: {same_tube_frame_id} to color: {same_tube_node.color}")
@@ -191,23 +191,23 @@ class GraphColoration:
                         pbar.update(1)
             color += 1
         pbar.close()
-        return self.graph
+        return graph
 
     # def starting_nodes_or_intersections(self):
     #     """
     #     Utility function to retrieve only the starting nodes
     #     """
 
-    def tube_starting_time(self):
+    def tube_starting_time(self, graph: RuanGraph):
         """
         Partially use Allegra Et al. optimization of the
         algorithm to calculate the starting time for the tubes,
         once the graph is colored.
         """
         li = {}
-        for tube in self.graph.tubes:
+        for tube in graph.tubes:
             optim = lambda node: node.color - (node.frame - tube.sframe)
-            nodes = self.graph.nodes[tube.tag].values()
+            nodes = graph.nodes[tube.tag].values()
             if len(nodes) == 1 and nodes[0].tag.endswith("isolated"):
                 # this tube is isolated so put it in the first frame of the video
                 li[tube.tag] = 1
@@ -215,14 +215,14 @@ class GraphColoration:
                 li[tube.tag] = max(1, min([optim(node) for node in nodes]))
 
         G = nx.Graph()
-        G.add_nodes_from([tube.tag for tube in self.graph.tubes])
+        G.add_nodes_from([tube.tag for tube in graph.tubes])
 
         edges = set()
-        for k1 in self.graph.list_node_tags:
-            v1 = self.graph.get_node_by_nodetag(k1)
-            for k2 in self.graph.list_node_tags:
-                v2 = self.graph.get_node_by_nodetag(k2)
-                if self.graph.A[k1][k2] == 0 or v1.tube.tag == v2.tube.tag:
+        for k1 in graph.list_node_tags:
+            v1 = graph.get_node_by_nodetag(k1)
+            for k2 in graph.list_node_tags:
+                v2 = graph.get_node_by_nodetag(k2)
+                if graph.A[k1][k2] == 0 or v1.tube.tag == v2.tube.tag:
                     continue
 
                 edges.add((v1.tube.tag, v2.tube.tag))

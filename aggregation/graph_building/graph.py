@@ -60,7 +60,7 @@ class RuanGraph(AbstractGraph):
 
     def compute_graph(self):
         """
-        Perform the nodes and edges generation process described in Ruan et al 2019
+        Perform the nodes and edges generation process described in Ruan et al. 2019
         I only compute the undirected edges to apply graph coloring algorithm
         with directed edges i represent it through the relation: "in the same tubes"
         """
@@ -93,7 +93,7 @@ class RuanGraph(AbstractGraph):
                         self.nodes[str(tube.tag)][str(src_frame_id)] = Node(src_tag, tube, src_frame_id)
 
                     # if trg_frame_id not in self.nodes[str(tube.tag)]:
-                    #     Hehe i do not have target tube to define the target node so hehehe i comment these lines :v
+                    #     Hehe i dont have target tube to define the target node so hehehe i let these lines in comments
                     #     node_tag = f"{tag}.{trg_frame_id}"
                     #     self.nodes[str(tag)][trg_frame_id] = Node(trg_tag, ....trg_tube, trg_frame_id)
 
@@ -111,7 +111,8 @@ class RuanGraph(AbstractGraph):
                 node.color = None
         return
 
-    def check_isolated_node(self, tube_relations):
+    @staticmethod
+    def check_isolated_node(tube_relations):
         """
         If a tube has irrelevant relations with all other tubes, then it can be abstract as an isolated main-node
         """
