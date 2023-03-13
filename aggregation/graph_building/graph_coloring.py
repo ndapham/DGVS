@@ -1,11 +1,8 @@
-from abc import ABC
-import operator
 import numpy as np
 import networkx as nx
 
-import tqdm as tqdm
+from tqdm import tqdm
 from aggregation.graph_building.graph import RuanGraph
-from extraction import Tube
 
 """
 Implement the heuristic graph coloring algorithm for L(q) Graph coloring introduced by He et al 2017
@@ -89,7 +86,7 @@ class SaturationCache:
         S_d can not be cached, need to computed it in each iteration while coloring
         """
         different_colors = set()
-        adjacent_nodes = self.graph.get_adjacent_node(node_tag)
+        adjacent_nodes = self.graph.get_adjacent_nodes(node_tag)
         for node_tag, node in adjacent_nodes:
             if node.color is not None:
                 different_colors.add(node.color)
@@ -141,13 +138,15 @@ class GraphColoration:
     #     tij = vj.frame - vi.frame
     #     return (proposed_color - vip.color) * (proposed_color + tij - vjp.color) > 0
 
-    def ssort(self, graph: RuanGraph, nodes_saturation):
+    @staticmethod
+    def ssort(graph: RuanGraph, nodes_saturation):
         """
         This function sorts the nodes in decreasing order by their degree of saturation.
         The appearance time is used to break ties.
         """
         get_appearance = lambda node_tag: graph.get_node_by_nodetag(node_tag).tube.sframe
-        order_list = [(node_tag, saturation, get_appearance(node_tag)) for node_tag, saturation in nodes_saturation]
+        order_list = [(node_tag, saturation, get_appearance(node_tag)) for node_tag, saturation in
+                      nodes_saturation.items()]
         order_list.sort(key=lambda x: (x[1], x[2]), reverse=True)
 
         return [node_tag for node_tag, saturation, appearance in order_list]
@@ -156,40 +155,42 @@ class GraphColoration:
         """
         Implements the graph coloring algorithm introduced by He et al. 2017
         """
-        color: int = 1
+        proposed_color: int = 1
         self.saturation_cache = SaturationCache(graph)
         graph.clean_colors()
-        pbar = tqdm(total=len(self.graph.list_node_tags))
+        pbar = tqdm(total=len(graph.list_node_tags))
 
         while len(graph.uncolored_nodes()) > 0:
+            print("Num uncolored nodes: ", len(graph.uncolored_nodes()))
             nodes_not_colored = graph.uncolored_nodes()
             nodes_saturation = self.saturation_cache.nodes_saturation(nodes_not_colored)
 
-            order_list = self.ssort(nodes_saturation)
+            order_list = self.ssort(graph, nodes_saturation)
             # nodes_saturation = self.saturation_cache.nodes_saturation(nodes_not_colored)
 
             for node_tag in order_list:
                 if graph.get_node_by_nodetag(node_tag).color is not None:
                     continue
-                if self.q_far_apart(color, node_tag):
+                if self.q_far_apart(graph, proposed_color, node_tag):
                     # Verbose =======================
-                    print(f"Coloring the node: {node_tag} to color: {color}")
+                    print(f"Coloring the node: {node_tag} to color: {proposed_color}")
                     # Verbose =======================
 
-                    graph.get_node_by_nodetag(node_tag).color = color
+                    graph.get_node_by_nodetag(node_tag).color = proposed_color
                     pbar.update(1)
 
                     # Color all the node in the same tube
                     tube_tag, frame_id = node_tag.split(".")
+                    if frame_id == "isolated":
+                        continue
 
                     for same_tube_frame_id, same_tube_node in graph.nodes[tube_tag].items():
-                        same_tube_node.color = color + int(same_tube_frame_id) - int(frame_id)
                         # Verbose =======================
                         print(f"Coloring in the same tube - id: {same_tube_frame_id} to color: {same_tube_node.color}")
                         # Verbose =======================
-
+                        same_tube_node.color = proposed_color + int(same_tube_frame_id) - int(frame_id)
                         pbar.update(1)
-            color += 1
+            proposed_color += 1
         pbar.close()
         return graph
 
@@ -207,13 +208,14 @@ class GraphColoration:
         li = {}
         for tube in graph.tubes:
             optim = lambda node: node.color - (node.frame - tube.sframe)
-            nodes = graph.nodes[tube.tag].values()
+            nodes = list(graph.nodes[str(tube.tag)].values())
+
             if len(nodes) == 1 and nodes[0].tag.endswith("isolated"):
                 # this tube is isolated so put it in the first frame of the video
                 li[tube.tag] = 1
             else:
                 li[tube.tag] = max(1, min([optim(node) for node in nodes]))
-
+        # print(li)
         G = nx.Graph()
         G.add_nodes_from([tube.tag for tube in graph.tubes])
 

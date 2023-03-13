@@ -173,7 +173,7 @@ def open_all_layers(model):
     r"""Opens all layers in model for training.
 
     Examples::
-        >>> from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import open_all_layers
+        >>> from extraction.strong_sort.deep.reid.torchreid.utils import open_all_layers
         >>> open_all_layers(model)
     """
     model.train()
@@ -190,7 +190,7 @@ def open_specified_layers(model, open_layers):
         open_layers (str or list): layers open for training.
 
     Examples::
-        >>> from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import open_specified_layers
+        >>> from extraction.strong_sort.deep.reid.torchreid.utils import open_specified_layers
         >>> # Only model.classifier will be updated.
         >>> open_layers = 'classifier'
         >>> open_specified_layers(model, open_layers)
@@ -229,7 +229,7 @@ def count_num_param(model):
         model (nn.Module): network model.
 
     Examples::
-        >>> from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import count_num_param
+        >>> from extraction.strong_sort.deep.reid.torchreid.utils import count_num_param
         >>> model_size = count_num_param(model)
 
     .. warning::
@@ -266,7 +266,7 @@ def load_pretrained_weights(model, weight_path):
         weight_path (str): path to pretrained weights.
 
     Examples::
-        >>> from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import load_pretrained_weights
+        >>> from extraction.strong_sort.deep.reid.torchreid.utils import load_pretrained_weights
         >>> weight_path = 'log/my_model/model-best.pth.tar'
         >>> load_pretrained_weights(model, weight_path)
     """

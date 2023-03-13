@@ -80,16 +80,16 @@ def create_tubes(list_tubes):
         tubes.append(tmp_tube)
         for r in tube.values():
             tmp_tube.next_bounding_box(r[0], r[1], r[2], r[3])
-        return tubes
+    return tubes
 
 
 if __name__ == "__main__":
     background = create_background()
     # Draw tubes
-    # tube1_image = draw_tubes(tube1, background)
-    # tube2_image = draw_tubes(tube2, tube1_image, (0, 0, 255))
-    # tube3_image = draw_tubes(tube3, tube2_image, (0, 255, 0))
-    # tube4_image = draw_tubes(tube4, tube3_image, (255, 0, 255))
+    # tube1_image = draw_tubes(tube1, background)   # red
+    # tube2_image = draw_tubes(tube2, tube1_image, (0, 0, 255)) # blue
+    # tube3_image = draw_tubes(tube3, tube2_image, (0, 255, 0)) # green
+    # tube4_image = draw_tubes(tube4, tube3_image, (255, 0, 255))   # purple
     # plt.imshow(tube4_image)
     # plt.show()
     list_tubes = [tube1, tube2, tube3, tube4]

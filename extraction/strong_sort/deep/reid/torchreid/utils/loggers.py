@@ -69,7 +69,7 @@ class RankLogger(object):
         targets (str or list): target dataset name(s).
 
     Examples::
-        >>> from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import RankLogger
+        >>> from extraction.strong_sort.deep.reid.torchreid.utils import RankLogger
         >>> s = 'market1501'
         >>> t = 'market1501'
         >>> ranklogger = RankLogger(s, t)

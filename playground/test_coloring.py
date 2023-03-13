@@ -94,9 +94,10 @@ if __name__ == "__main__":
     # plt.show()
     list_tubes = [tube1, tube2, tube3, tube4]
     tubes = create_tubes(list_tubes)
-    relation_map = RuanRelationsMap(tubes)
+    relation_map = RuanRelationsMap(tubes, vectorized_computation=False)
     graph_coloration = GraphColoration(3)
     graph = RuanGraph(tubes=tubes, relations=relation_map)
     graph = graph_coloration.color_graph(graph=graph)
+    print(graph.nodes)
     current_starting_times = graph_coloration.tube_starting_time(graph)
     pp.pprint(current_starting_times)

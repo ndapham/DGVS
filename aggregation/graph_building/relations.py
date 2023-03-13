@@ -1,5 +1,6 @@
 from abc import ABC
 from itertools import permutations
+from tqdm import tqdm
 
 
 class AbstractRelations(ABC):
@@ -7,7 +8,6 @@ class AbstractRelations(ABC):
         self.tubes = tubes
         self.relations_dict = {}
         self._fill_with_irrelevant_relations()
-        self.compute_relations()
 
     def _fill_with_irrelevant_relations(self):
         for Ta in self.tubes:
@@ -27,6 +27,7 @@ class RuanRelationsMap(AbstractRelations):
     def __init__(self, tubes, vectorized_computation=False):
         super(RuanRelationsMap, self).__init__(tubes)
         self.vectorized_computation = vectorized_computation
+        self.compute_relations()
 
     def compute_relations(self):
         if self.vectorized_computation:
@@ -36,10 +37,10 @@ class RuanRelationsMap(AbstractRelations):
 
     # Compute relations among tubes using loops
     def compute_relations_by_loops(self):
-        n = len(self.tubes)
+        n: int = len(self.tubes)
 
         # Using 4 nested loops, do not recommend , but it leads to better memory usage compares to matrices
-        for Ta, Tb in permutations(self.tubes):
+        for Ta, Tb in tqdm(permutations(self.tubes, 2), total=n * (n - 1)):
             if Ta == Tb:
                 continue
             for a_data in Ta:
@@ -47,13 +48,14 @@ class RuanRelationsMap(AbstractRelations):
                     if self._frame_intersect(a_data, b_data):
                         src_frame = a_data[4]  # a_data: x, y, w, h, frame_id
                         trg_frame = b_data[4]  # b_data: x, y, w, h, frame_id
-                        if self.relations_dict[Ta.tag][Tb.tab] is None:
+                        if self.relations_dict[Ta.tag][Tb.tag] is None:
                             self.relations_dict[Ta.tag][Tb.tag] = []
                         self.relations_dict[Ta.tag][Tb.tag].append((src_frame, trg_frame))
 
             #  Utilize computed relations
             if self.relations_dict[Tb.tag][Ta.tag] is not None:
-                self.relations_dict[Ta.tag][Tb.tag] = [(item[1], item[0]) for item in self.relations_dict[Tb.tag][Ta.tag]]
+                self.relations_dict[Ta.tag][Tb.tag] = [(item[1], item[0]) for item in
+                                                       self.relations_dict[Tb.tag][Ta.tag]]
 
     @staticmethod
     def _frame_intersect(src_frame_data, trg_frame_data):

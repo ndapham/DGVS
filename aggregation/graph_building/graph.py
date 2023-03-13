@@ -82,7 +82,7 @@ class RuanGraph(AbstractGraph):
                 # tag: the tag of src_tube, relation is the list of pairs of frame id that collided
 
                 # if there is no collisions between 2 tubes so keep going through
-                if (tag == tube.tag) or (len(relation) == 0):
+                if (tag == tube.tag) or relation is None:
                     continue
 
                 for src_frame_id, trg_frame_id in relation:
@@ -106,7 +106,8 @@ class RuanGraph(AbstractGraph):
         """
         Reset all the color in nodes to None
         """
-        for tube_tag in self.nodes.values():
+
+        for tube_tag in self.nodes.keys():
             for node in self.nodes[tube_tag].values():
                 node.color = None
         return
@@ -155,10 +156,10 @@ class RuanGraph(AbstractGraph):
         """
         Return all the nodes that are adjacent with the original node referenced by node tag
         """
-        if node_tag in self.list_node_tags:
+        if node_tag not in self.list_node_tags:
             return None
 
-        return [(tag, self.get_node_by_nodetag(tag) for tag in self.list_node_tags if self.A[node_tag][tag] != 0)]
+        return [(tag, self.get_node_by_nodetag(tag)) for tag in self.list_node_tags if self.A[node_tag][tag] != 0]
 
     def uncolored_nodes(self) -> List[str]:
         return [node_tag for node_tag in self.list_node_tags if self.get_node_by_nodetag(node_tag).color is None]
