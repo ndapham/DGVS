@@ -8,12 +8,12 @@ import torch
 from torch.nn import functional as F
 from torch.utils.tensorboard import SummaryWriter
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid import metrics
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import (
+from extraction.strong_sort.deep.reid.torchreid import metrics
+from extraction.strong_sort.deep.reid.torchreid.utils import (
     MetricMeter, AverageMeter, re_ranking, open_all_layers, save_checkpoint,
     open_specified_layers, visualize_ranked_results
 )
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.losses import DeepSupervision
+from extraction.strong_sort.deep.reid.torchreid.losses import DeepSupervision
 
 
 class Engine(object):

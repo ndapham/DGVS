@@ -13,7 +13,7 @@ import torch
 from torch.nn import functional as F
 
 import torchreid
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import (
+from extraction.strong_sort.deep.reid.torchreid.utils import (
     check_isfile, mkdir_if_missing, load_pretrained_weights
 )
 

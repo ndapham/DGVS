@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 
 import torchreid
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import (
+from extraction.strong_sort.deep.reid.torchreid.utils import (
     Logger, check_isfile, set_random_seed, collect_env_info,
     resume_from_checkpoint, load_pretrained_weights, compute_model_complexity
 )

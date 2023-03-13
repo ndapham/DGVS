@@ -1,7 +1,7 @@
 from __future__ import division, print_function, absolute_import
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid import metrics
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.losses import TripletLoss, CrossEntropyLoss
+from extraction.strong_sort.deep.reid.torchreid import metrics
+from extraction.strong_sort.deep.reid.torchreid.losses import TripletLoss, CrossEntropyLoss
 
 from ..engine import Engine
 

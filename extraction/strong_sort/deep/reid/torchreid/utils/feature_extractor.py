@@ -36,7 +36,7 @@ class FeatureExtractor(object):
 
     Examples::
 
-        from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import FeatureExtractor
+        from extraction.strong_sort.deep.reid.torchreid.utils import FeatureExtractor
 
         extractor = FeatureExtractor(
             model_name='osnet_x1_0',

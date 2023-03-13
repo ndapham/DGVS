@@ -4,7 +4,7 @@ import numpy as np
 import timeit
 import os.path as osp
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid import metrics
+from extraction.strong_sort.deep.reid.torchreid import metrics
 
 sys.path.insert(0, osp.dirname(osp.abspath(__file__)) + '/../../..')
 """

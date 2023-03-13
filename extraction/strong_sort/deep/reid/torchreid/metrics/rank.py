@@ -6,7 +6,7 @@ from collections import defaultdict
 IS_CYTHON_AVAI = False
 
 # try:
-#     from pcgvs.extraction.strong_sort.deep.reid.torchreid.metrics.rank_cylib.rank_cy import evaluate_cy
+#     from extraction.strong_sort.deep.reid.torchreid.metrics.rank_cylib.rank_cy import evaluate_cy
 #     IS_CYTHON_AVAI = True
 # except ImportError:
 #     IS_CYTHON_AVAI = False

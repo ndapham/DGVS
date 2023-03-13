@@ -15,7 +15,7 @@ def accuracy(output, target, topk=(1, )):
         list: accuracy at top-k.
 
     Examples::
-        >>> from pcgvs.extraction.strong_sort.deep.reid.torchreid import metrics
+        >>> from extraction.strong_sort.deep.reid.torchreid import metrics
         >>> metrics.accuracy(output, target)
     """
     maxk = max(topk)

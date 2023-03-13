@@ -1,7 +1,7 @@
 from __future__ import division, print_function, absolute_import
 import torch
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.engine.image import ImageSoftmaxEngine
+from extraction.strong_sort.deep.reid.torchreid.engine.image import ImageSoftmaxEngine
 
 
 class VideoSoftmaxEngine(ImageSoftmaxEngine):

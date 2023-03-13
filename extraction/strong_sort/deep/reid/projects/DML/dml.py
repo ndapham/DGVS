@@ -2,9 +2,9 @@ from __future__ import division, print_function, absolute_import
 import torch
 from torch.nn import functional as F
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import open_all_layers, open_specified_layers
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.engine import Engine
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.losses import TripletLoss, CrossEntropyLoss
+from extraction.strong_sort.deep.reid.torchreid.utils import open_all_layers, open_specified_layers
+from extraction.strong_sort.deep.reid.torchreid.engine import Engine
+from extraction.strong_sort.deep.reid.torchreid.losses import TripletLoss, CrossEntropyLoss
 
 
 class ImageDMLEngine(Engine):

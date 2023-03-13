@@ -20,7 +20,7 @@ class Logger(object):
        >>> import sys
        >>> import os
        >>> import os.path as osp
-       >>> from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import Logger
+       >>> from extraction.strong_sort.deep.reid.torchreid.utils import Logger
        >>> save_dir = 'log/resnet50-softmax-market1501'
        >>> log_name = 'train.log'
        >>> sys.stdout = Logger(osp.join(args.save_dir, log_name))

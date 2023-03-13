@@ -59,7 +59,7 @@ We provide a tool in ``torchreid.utils.model_complexity.py`` to automatically co
 
 .. code-block:: python
     
-    from pcgvs.extraction.strong_sort.deep.reid.torchreid import models, utils
+    from extraction.strong_sort.deep.reid.torchreid import models, utils
     
     model = models.build_model(name='resnet50', num_classes=1000)
     num_params, flops = utils.compute_model_complexity(model, (1, 3, 256, 128))
@@ -258,7 +258,7 @@ Use your own dataset
     import os
     import os.path as osp
 
-    from pcgvs.extraction.strong_sort.deep.reid.torchreid.data import ImageDataset
+    from extraction.strong_sort.deep.reid.torchreid.data import ImageDataset
 
 
     class NewDataset(ImageDataset):
@@ -331,7 +331,7 @@ We have provided a simple API for feature extraction, which accepts input of var
 
 .. code-block:: python
 
-    from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import FeatureExtractor
+    from extraction.strong_sort.deep.reid.torchreid.utils import FeatureExtractor
 
     extractor = FeatureExtractor(
         model_name='osnet_x1_0',

@@ -1,7 +1,7 @@
 from __future__ import division, print_function, absolute_import
 import os.path as osp
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import read_image
+from extraction.strong_sort.deep.reid.torchreid.utils import read_image
 
 
 class Dataset(object):

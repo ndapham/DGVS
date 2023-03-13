@@ -71,7 +71,7 @@ def load_checkpoint(fpath):
         dict
 
     Examples::
-        >>> from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import load_checkpoint
+        >>> from extraction.strong_sort.deep.reid.torchreid.utils import load_checkpoint
         >>> fpath = 'log/my_model/model.pth.tar-10'
         >>> checkpoint = load_checkpoint(fpath)
     """
@@ -111,7 +111,7 @@ def resume_from_checkpoint(fpath, model, optimizer=None, scheduler=None):
         int: start_epoch.
 
     Examples::
-        >>> from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import resume_from_checkpoint
+        >>> from extraction.strong_sort.deep.reid.torchreid.utils import resume_from_checkpoint
         >>> fpath = 'log/my_model/model.pth.tar-10'
         >>> start_epoch = resume_from_checkpoint(
         >>>     fpath, model, optimizer, scheduler

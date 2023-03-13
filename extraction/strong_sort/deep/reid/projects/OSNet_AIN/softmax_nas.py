@@ -1,8 +1,8 @@
 from __future__ import division, print_function, absolute_import
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid import metrics
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.engine import Engine
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.losses import CrossEntropyLoss
+from extraction.strong_sort.deep.reid.torchreid import metrics
+from extraction.strong_sort.deep.reid.torchreid.engine import Engine
+from extraction.strong_sort.deep.reid.torchreid.losses import CrossEntropyLoss
 
 
 class ImageSoftmaxNASEngine(Engine):
