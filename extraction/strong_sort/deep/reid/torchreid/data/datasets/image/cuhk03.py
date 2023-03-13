@@ -1,7 +1,7 @@
 from __future__ import division, print_function, absolute_import
 import os.path as osp
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import read_json, write_json, mkdir_if_missing
+from extraction.strong_sort.deep.reid.torchreid.utils import read_json, write_json, mkdir_if_missing
 
 from ..dataset import ImageDataset
 

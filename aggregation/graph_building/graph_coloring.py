@@ -228,12 +228,14 @@ class GraphColoration:
                 edges.add((v1.tube.tag, v2.tube.tag))
 
         starting_time = {}
-
         for Ck in nx.connected_components(G):
             tmp = sorted(li.items(), key=lambda item: item[1])
             Ck_ordered = {k: v for k, v in tmp if k in Ck}
             l1 = min([l for tag, l in li.items() if tag in Ck])
             for i, tag in enumerate(Ck_ordered):
                 starting_time[tag] = l1 + (self.q * i)
+
+        # Assign the starting time for the appearance time of tubes
+        graph.update_appearance_time(starting_time)
 
         return starting_time

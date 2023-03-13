@@ -73,8 +73,8 @@ class RuanGraph(AbstractGraph):
 
             # If a tube is isolated, i create a node for its first frame
             if self.check_isolated_node(tube_relations):
-                node_tag = f"{tube.tag}-isolated"
-                self.nodes[str(tube.tag)][str(0)] = Node(node_tag, tube)
+                node_tag = f"{tube.tag}.isolated"
+                self.nodes[str(tube.tag)]["isolated"] = Node(node_tag, tube)
                 continue
 
             # If the tube collide with some other tubes, i build nodes for frame that witness the collisions
@@ -128,6 +128,11 @@ class RuanGraph(AbstractGraph):
         return
 
     def get_node_by_nodetag(self, node_tag):
+        # In case the node tag refers an isolated node "{tube.tag}.isolated"
+        if node_tag.endswith("isolated"):
+            tube_tag, _ = node_tag.split(".")
+            return self.nodes[tube_tag]["isolated"]
+        # In case the node tag refers a sub node in a tube "{tube.tag}.frame_id"
         tube_tag, frame_id = node_tag.split(".")
         return self.nodes[tube_tag][frame_id]
 
@@ -157,3 +162,9 @@ class RuanGraph(AbstractGraph):
 
     def uncolored_nodes(self) -> List[str]:
         return [node_tag for node_tag in self.list_node_tags if self.get_node_by_nodetag(node_tag).color is None]
+
+    def update_appearance_time(self, starting_times: dict):
+        for tube in self.tubes:
+            if tube.tag in starting_times:
+                tube.color = starting_times[tube.tag]
+        return

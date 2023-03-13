@@ -3,7 +3,7 @@ import glob
 import os.path as osp
 import warnings
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import read_json, write_json
+from extraction.strong_sort.deep.reid.torchreid.utils import read_json, write_json
 
 from ..dataset import VideoDataset
 

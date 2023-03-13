@@ -1,7 +1,7 @@
 # vim: expandtab:ts=4:sw=4
 import numpy as np
 import torch
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.metrics.distance import compute_distance_matrix
+from extraction.strong_sort.deep.reid.torchreid.metrics.distance import compute_distance_matrix
 
 
 def _pdist(a, b):

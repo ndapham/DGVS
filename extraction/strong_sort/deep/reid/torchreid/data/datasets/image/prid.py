@@ -2,7 +2,7 @@ from __future__ import division, print_function, absolute_import
 import random
 import os.path as osp
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import read_json, write_json
+from extraction.strong_sort.deep.reid.torchreid.utils import read_json, write_json
 
 from ..dataset import ImageDataset
 

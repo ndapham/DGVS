@@ -6,7 +6,7 @@ import tarfile
 import zipfile
 import torch
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import read_image, download_url, mkdir_if_missing
+from extraction.strong_sort.deep.reid.torchreid.utils import read_image, download_url, mkdir_if_missing
 
 
 class Dataset(object):

@@ -13,6 +13,7 @@ from extraction.track import run
 class Tube:
     def __init__(self, tag, sframe, eframe):
         self.tag = tag
+        self.color = None  # the appearance time after re-arranging tubes - color of the start frame
         self.sframe = sframe
         self.eframe = eframe
         self.bbX = []  # bounding box x-axis

@@ -3,7 +3,7 @@ import glob
 import numpy as np
 import os.path as osp
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.utils import read_json, write_json
+from extraction.strong_sort.deep.reid.torchreid.utils import read_json, write_json
 
 from ..dataset import ImageDataset
 

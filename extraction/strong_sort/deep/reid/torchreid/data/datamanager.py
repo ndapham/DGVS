@@ -1,9 +1,9 @@
 from __future__ import division, print_function, absolute_import
 import torch
 
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.data.sampler import build_train_sampler
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.data.datasets import init_image_dataset, init_video_dataset
-from pcgvs.extraction.strong_sort.deep.reid.torchreid.data.transforms import build_transforms
+from extraction.strong_sort.deep.reid.torchreid.data.sampler import build_train_sampler
+from extraction.strong_sort.deep.reid.torchreid.data.datasets import init_image_dataset, init_video_dataset
+from extraction.strong_sort.deep.reid.torchreid.data.transforms import build_transforms
 
 
 class DataManager(object):

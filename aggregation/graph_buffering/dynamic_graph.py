@@ -63,14 +63,13 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         self.graph.tubes = [tube for tube in self.graph.tubes if tube.tag != removed_tag]
         return removed_tubes, remove_starting_time
 
-    def gc(self, tube: Tube, n):
+    @staticmethod
+    def get_color(tube: Tube, n):
         """
         Given the tube  and n is a number
         return the appearance times of the nth frame of that tube
         """
-        tube_tag = tube.tag
-        appearance_time = self.current_starting_times[tube_tag] + n - 1
-        return appearance_time
+        return tube.color + n - 1
 
     def updating(self, new_tube, c_min):
         """
@@ -82,11 +81,10 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         return self.graph
 
     def adding(self, new_tube, c_min):
-        for a_data in new_tube:
-            for Tb in self.graph.tubes:
-                for b_data in Tb:
-                    if self.frame_intersect(a_data, b_data):
-
+        # for a_data in new_tube:
+        #     for Tb in self.graph.tubes:
+        #         for b_data in Tb:
+        #             if self.frame_intersect(a_data, b_data):
 
         return self.graph
 
