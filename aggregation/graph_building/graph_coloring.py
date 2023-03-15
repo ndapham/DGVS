@@ -129,6 +129,7 @@ class GraphColoration:
     #     """
     #     Condition 2 in He et al. 2017 paper which imposed a strict rule to avoid collisions
     #     However, Ruan et al. 2019 not define the Overlapping relation so this is unnecessary
+    #     but i still copy the code for implementing that condition below and comment it
     #     """
     #     if pcg.generated_by_intersection(nodekey) or pcg.isolated_main_node(nodekey):
     #         return True

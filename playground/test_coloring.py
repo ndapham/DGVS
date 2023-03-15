@@ -8,7 +8,7 @@ from aggregation.graph_building.relations import RuanRelationsMap
 from aggregation.graph_building.graph import RuanGraph
 from aggregation.graph_building.graph_coloring import GraphColoration
 
-# Define 4 tubes as examples
+# Define 4 tubes as examples, play with toys first hehehe :))
 tube1 = {
     0: [96, 80, 32, 64],
     1: [112, 80, 35, 60],

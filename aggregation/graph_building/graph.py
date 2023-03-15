@@ -169,3 +169,5 @@ class RuanGraph(AbstractGraph):
             if tube.tag in starting_times:
                 tube.color = starting_times[tube.tag]
         return
+
+    def get_end

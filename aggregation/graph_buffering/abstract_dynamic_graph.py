@@ -1,8 +1,6 @@
-import torch
 from abc import ABC
 
 from extraction import Tube
-from aggregation.graph_building.graph import AbstractGraph, RuanGraph
 
 
 class AbstractDynamicGraph(ABC):
@@ -16,13 +14,13 @@ class AbstractDynamicGraph(ABC):
         self.graph = None  # graph of activity tubes
         self.number_of_collisions = list()  # list of number collision at each time location
 
-    def updating(self, new_tube, c_min):
+    def updating(self, new_tube):
         raise Exception("Using function for updating the graph buffer in the abstract class")
 
-    def adding(self, new_tube, c_min):
+    def adding(self, new_tube):
         raise Exception("Using function for adding tube to graph buffer in the abstract class")
 
-    def adjusting(self, new_tube, c_min):
+    def adjusting(self, new_tube):
         raise Exception("Using function for adding the graph buffer in the abstract class")
 
     def removing(self) -> Tube:
