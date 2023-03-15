@@ -2,7 +2,7 @@
 A method using dynamic graph to solve the task of video synopsis
 
 This is my implementation. 
-- The backbone come from what i read from the original and related papers. 
+- Strongly based on what i read from the original and related papers. 
 
 - I filled it with my guesswork and imagination :woozy_face: and it doesn't work at this time :+1:.
 
