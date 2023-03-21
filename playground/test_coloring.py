@@ -8,7 +8,7 @@ from aggregation.graph_building.relations import RuanRelationsMap
 from aggregation.graph_building.graph import RuanGraph
 from aggregation.graph_building.graph_coloring import GraphColoration
 
-# Define 4 tubes as examples, play with toys first hehehe :))
+# Define 4 tubes as examples
 tube1 = {
     0: [96, 80, 32, 64],
     1: [112, 80, 35, 60],
@@ -80,24 +80,23 @@ def create_tubes(list_tubes):
         tubes.append(tmp_tube)
         for r in tube.values():
             tmp_tube.next_bounding_box(r[0], r[1], r[2], r[3])
-        return tubes
+    return tubes
 
 
 if __name__ == "__main__":
     background = create_background()
     # Draw tubes
-    # tube1_image = draw_tubes(tube1, background)
-    # tube2_image = draw_tubes(tube2, tube1_image, (0, 0, 255))
-    # tube3_image = draw_tubes(tube3, tube2_image, (0, 255, 0))
-    # tube4_image = draw_tubes(tube4, tube3_image, (255, 0, 255))
+    # tube1_image = draw_tubes(tube1, background)   # red
+    # tube2_image = draw_tubes(tube2, tube1_image, (0, 0, 255)) # blue
+    # tube3_image = draw_tubes(tube3, tube2_image, (0, 255, 0)) # green
+    # tube4_image = draw_tubes(tube4, tube3_image, (255, 0, 255))   # purple
     # plt.imshow(tube4_image)
     # plt.show()
     list_tubes = [tube1, tube2, tube3, tube4]
     tubes = create_tubes(list_tubes)
-    relation_map = RuanRelationsMap(tubes, vectorized_computation=False)
+    relation_map = RuanRelationsMap(tubes)
     graph_coloration = GraphColoration(3)
     graph = RuanGraph(tubes=tubes, relations=relation_map)
     graph = graph_coloration.color_graph(graph=graph)
-    print(graph.nodes)
     current_starting_times = graph_coloration.tube_starting_time(graph)
     pp.pprint(current_starting_times)

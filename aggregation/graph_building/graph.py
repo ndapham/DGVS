@@ -166,8 +166,17 @@ class RuanGraph(AbstractGraph):
 
     def update_appearance_time(self, starting_times: dict):
         for tube in self.tubes:
-            if tube.tag in starting_times:
-                tube.color = starting_times[tube.tag]
+            assert tube.tag in starting_times, f"Expect tube with tag: {tube.tag} in starting times dictionary"
+            tube.color = starting_times[tube.tag]
         return
 
-    def get_end
+    def get_end_time_location(self):
+        """
+        Calculate the ending time of the last tube in the graph
+        This function is used in updating function for dynamic graph to
+        """
+        end_time_location = 0
+        for tube in self.tubes:
+            tube_end = tube.color + tube.eframe - tube.sframe
+            end_time_location = end_time_location if end_time_location >= tube_end else tube_end
+        return end_time_location

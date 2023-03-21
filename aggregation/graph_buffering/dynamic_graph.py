@@ -1,5 +1,3 @@
-import time
-
 from aggregation.graph_buffering.abstract_dynamic_graph import AbstractDynamicGraph
 from aggregation.graph_building.graph import RuanGraph
 from aggregation.graph_building.graph_coloring import GraphColoration
@@ -14,13 +12,17 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         self.current_starting_times = None  # the starting times for tubes in current graph (time step t)
         self.graph_coloration = None  # The coloring machine that helps to color the initial graph
         self.c_min = 0  # c_min value in Ruan et al. 2019 - available value for new tube stitching in
+        self.output_tubes = []
 
-    def run_pipeline(self):
+    def run_pipeline(self, tubes):
         """
         Pipeline using to update the graph through time steps.
         Combine with the method using potential collisions graph
         """
-        # TODO: define tubes_buffer for further development for real-time
+        # TODO: define tubes_buffer for further development for real-time applications
+        # Currently, tube_buffer receive all the tubes. This can be used for offline synopsis only
+        self.tubes_buffer = tubes
+
         while len(self.tubes_buffer):
             # Push a tube from buffer to process
             self.tubes_in_process.append(self.tubes_buffer[0])
@@ -38,12 +40,14 @@ class RuanDynamicGraph(AbstractDynamicGraph):
                     self.graph_coloration = GraphColoration(self.q)
                     self.graph = self.graph_coloration.color_graph(self.graph)
                     self.current_starting_times = self.graph_coloration.tube_starting_time(self.graph)
+                    self.tubes_in_process = self.graph.tubes
                 else:
                     new_tube = self.tubes_in_process[-1]
 
                     # Remove the tube with minimum starting times
                     tube_del, removed_tag = self.removing()
                     # TODO: records the removed tube for stitching
+                    self.output_tubes.append(tube_del)
 
                     # Update the value of c_min
                     self.c_min = max(self.c_min, tube_del.color)
@@ -53,14 +57,19 @@ class RuanDynamicGraph(AbstractDynamicGraph):
 
                     # Update the list of tubes in processing
                     self.tubes_in_process = self.graph.tubes
-                    # TODO: record the final graph to stitch the rest tubes in synopsis video
+
+        # TODO: record the final graph to stitch the rest tubes in synopsis video
+        self.tubes_in_process = sorted(self.tubes_in_process, key=lambda in_prog_tube: in_prog_tube.color)
+        self.output_tubes.extend(self.tubes_in_process)
+
+        return self.output_tubes
 
     def removing(self):
         """
         Remove the tube with minimum starting time then stitch it to the output video
         """
         # Sort to get the tube with the minimum starting time to remove it
-        tmp = sorted(self.current_starting_times.items(), key=lambda item: item[1])
+        tmp = sorted(self.tubes_in_process, key=lambda in_prog_tube: in_prog_tube.color)
 
         # Get the information of removed_tubes to stitch it to the video synopsis
         removed_tag, remove_starting_time = tmp[0]
@@ -84,15 +93,26 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         Compare between two method adding and adjusting, choose the method that give
         better condensation.
         """
-        tmp_graph1 = self.adding(new_tube)
-        tmp_graph2 = self.adjusting(new_tube)
+        # Save the current graph for further updates
+        callback_graph = self.graph
 
-        
+        # Try using the adding method to update the graph
+        tmp_graph1 = self.adding(new_tube)
+        adding_end_time_location = tmp_graph1.get_end_time_location()
+
+        # Try using the adjusting method to update the graph
+        self.graph = callback_graph
+        tmp_graph2 = self.adjusting(new_tube)
+        adjusting_end_time_location = tmp_graph2.get_end_time_location()
+
+        # Update graph
+        self.graph = tmp_graph1 if adding_end_time_location <= adjusting_end_time_location else tmp_graph2
+
         return self.graph
 
     def adding(self, new_tube: Tube):
         """
-        @@ hehehe @@ Adding method described by Ruan et al. 2019
+        Adding method described by Ruan et al. 2019
         """
         # TODO: Define NC as a list or a dict? how to manage memory if number_of_collisions as a list
         # Try to place the new tube in the available graph
@@ -133,7 +153,7 @@ class RuanDynamicGraph(AbstractDynamicGraph):
                     if frame_intersect(a_data, b_data):
                         is_collided_flag = True
                         # In paper, authors described tube buffer as a queue,
-                        # so i wonder if this could make chronological disorders
+                        # so I wonder if this could make chronological disorders
                         queue.append(potential_collide_tube)
                         self.graph.tubes = [tube for tube in self.graph.tubes if tube.tag != potential_collide_tube.tag]
                         break

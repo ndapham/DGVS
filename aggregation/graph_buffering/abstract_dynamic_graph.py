@@ -15,13 +15,13 @@ class AbstractDynamicGraph(ABC):
         self.number_of_collisions = list()  # list of number collision at each time location
 
     def updating(self, new_tube):
-        raise Exception("Using function for updating the graph buffer in the abstract class")
+        raise Exception("Using function for updating the dynamic graph in the abstract class")
 
     def adding(self, new_tube):
-        raise Exception("Using function for adding tube to graph buffer in the abstract class")
+        raise Exception("Using function for adding tube to the dynamic graph in the abstract class")
 
     def adjusting(self, new_tube):
-        raise Exception("Using function for adding the graph buffer in the abstract class")
+        raise Exception("Using function for adding the dynamic graph in the abstract class")
 
     def removing(self) -> Tube:
-        raise Exception("Using function for removing tube from graph buffer in the abstract class")
+        raise Exception("Using function for removing tube from dynamic graph in the abstract class")
