@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from fusion.interpolation import complete_frames
+from utils.helpers import get_video_shape
 
 
 def generate_frames(dataframe, patches_path):
@@ -22,3 +23,15 @@ def generate_frames(dataframe, patches_path):
             'frame': int(row['frame'])
         })
     return frames
+
+
+def generate_synopsis(frames, output_dir, fps, background_path, interp=False):
+    """
+    Generate the final video based on frame data which comes from aggregation
+    """
+    output = path.join(output_dir, "synopsis.avi")
+    _frames = frames.copy()
+    max_frame = max(list(_frames.keys()))
+
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    width, height = get_video_shape(background_path)
