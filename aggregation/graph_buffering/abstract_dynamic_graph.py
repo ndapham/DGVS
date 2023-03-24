@@ -12,7 +12,7 @@ class AbstractDynamicGraph(ABC):
         self.tubes_buffer = []  # Buffer stores tubes to push in graph
         self.tubes_in_process = []  # List of tubes to compute the graph
         self.graph = None  # graph of activity tubes
-        self.number_of_collisions = list()  # list of number collision at each time location
+        self.number_of_collisions = dict()  # list of number collision at each time location
 
     def updating(self, new_tube):
         raise Exception("Using function for updating the dynamic graph in the abstract class")

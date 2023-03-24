@@ -1,3 +1,7 @@
+import pprint
+from typing import List
+import copy
+
 from aggregation.graph_buffering.abstract_dynamic_graph import AbstractDynamicGraph
 from aggregation.graph_building.graph import RuanGraph
 from aggregation.graph_building.graph_coloring import GraphColoration
@@ -19,11 +23,12 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         Pipeline using to update the graph through time steps.
         Combine with the method using potential collisions graph
         """
-        # TODO: define tubes_buffer for further development for real-time applications
-        # Currently, tube_buffer receive all the tubes. This can be used for offline synopsis only
+        # TODO: define tubes_buffer for further developments for real-time applications
+        # Currently, tubes_buffer receive all the whole set of tubes. This can be used for offline synopsis only
         self.tubes_buffer = tubes
 
         while len(self.tubes_buffer):
+            print([tube.tag for tube in self.tubes_buffer])
             # Push a tube from buffer to process
             self.tubes_in_process.append(self.tubes_buffer[0])
             self.tubes_buffer = self.tubes_buffer[1:]
@@ -40,23 +45,24 @@ class RuanDynamicGraph(AbstractDynamicGraph):
                     self.graph_coloration = GraphColoration(self.q)
                     self.graph = self.graph_coloration.color_graph(self.graph)
                     self.current_starting_times = self.graph_coloration.tube_starting_time(self.graph)
-                    self.tubes_in_process = self.graph.tubes
+                    self.tubes_in_process = self.graph.tubes.copy()
+
                 else:
                     new_tube = self.tubes_in_process[-1]
 
                     # Remove the tube with minimum starting times
-                    tube_del, removed_tag = self.removing()
+                    tubes_del, remove_starting_times = self.removing()
                     # TODO: records the removed tube for stitching
-                    self.output_tubes.append(tube_del)
+                    self.output_tubes.extend(tubes_del)
 
                     # Update the value of c_min
-                    self.c_min = max(self.c_min, tube_del.color)
+                    self.c_min = max(self.c_min, remove_starting_times)
 
                     # Update the graph
                     self.graph = self.updating(new_tube)
 
                     # Update the list of tubes in processing
-                    self.tubes_in_process = self.graph.tubes
+                    self.tubes_in_process = self.graph.tubes.copy()
 
         # TODO: record the final graph to stitch the rest tubes in synopsis video
         self.tubes_in_process = sorted(self.tubes_in_process, key=lambda in_prog_tube: in_prog_tube.color)
@@ -68,12 +74,20 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         """
         Remove the tube with minimum starting time then stitch it to the output video
         """
+        # Verbose ============================================
+        print("=" * 50)
+        for tube in self.graph.tubes:
+            print(f'tube: {tube.tag} - color: {tube.color}')
+        # Verbose ============================================
         # Sort to get the tube with the minimum starting time to remove it
-        tmp = sorted(self.tubes_in_process, key=lambda in_prog_tube: in_prog_tube.color)
+        tmp: List[Tube]  # tmp is the sorted list of tubes
+        tmp = sorted(self.graph.tubes, key=lambda in_prog_tube: in_prog_tube.color)
 
         # Get the information of removed_tubes to stitch it to the video synopsis
-        removed_tag, remove_starting_time = tmp[0]
+        removed_tag, remove_starting_time = tmp[0].tag, tmp[0].color
         removed_tubes = [tube for tube in self.graph.tubes if tube.tag == removed_tag]
+        assert len(removed_tubes) == 1, \
+            f"Expected only one tube be removed each iter but there are {len(removed_tubes)} due to duplicated tube tag"
 
         # Update the list of rest tube in graph
         self.graph.tubes = [tube for tube in self.graph.tubes if tube.tag != removed_tag]
@@ -94,7 +108,7 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         better condensation.
         """
         # Save the current graph for further updates
-        callback_graph = self.graph
+        callback_graph = copy.deepcopy(self.graph)
 
         # Try using the adding method to update the graph
         tmp_graph1 = self.adding(new_tube)
@@ -117,19 +131,21 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         # TODO: Define NC as a list or a dict? how to manage memory if number_of_collisions as a list
         # Try to place the new tube in the available graph
         c_tmp: int = 0
-        for a_index, a_data in new_tube:
-            for tube_in_process in self.graph.tubes:
-                for b_index, b_data in enumerate(tube_in_process):
+        for a_index, a_data in enumerate(new_tube):
+            for potential_collision_tube in (self.output_tubes + self.graph.tubes):
+                for b_index, b_data in enumerate(potential_collision_tube):
                     if frame_intersect(a_data, b_data):
-                        c_tmp = self.get_color(tube_in_process, b_index) - a_index + 1
+                        c_tmp = self.get_color(potential_collision_tube, b_index) - a_index + 1
                     if c_tmp >= 0:
-                        self.number_of_collisions[c_tmp] = self.number_of_collisions[c_tmp] + 1
+                        self.number_of_collisions[c_tmp] = self.number_of_collisions.get(c_tmp, 0) + 1
 
         # Color the new tube based on the list of available places
-        for color in range(self.c_min, len(self.number_of_collisions)):
-            if self.number_of_collisions[color] <= self.h:
+        color = self.c_min
+        while 1:
+            if self.number_of_collisions.get(color, 0) <= self.h:
                 new_tube.color = color
-
+                break
+            color += 1
         # Add new tube to available graph to create new graph G(t+1)
         self.graph.tubes.append(new_tube)
         return self.graph

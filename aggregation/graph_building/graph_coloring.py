@@ -116,12 +116,12 @@ class GraphColoration:
         to the node referenced must be at least q far apart
         """
         adjacent_nodes = graph.get_adjacent_nodes(node_tag)
-        for tag, node in adjacent_nodes:
+        for tag, adj_node in adjacent_nodes:
             if graph.A[node_tag][tag] != 1:
                 continue
-            if node.color is None:
+            if adj_node.color is None:
                 continue
-            if np.abs(node.color - proposed_color) <= self.q:
+            if np.abs(adj_node.color - proposed_color) <= self.q:
                 return False
         return True
 
@@ -172,7 +172,13 @@ class GraphColoration:
             for node_tag in order_list:
                 if graph.get_node_by_nodetag(node_tag).color is not None:
                     continue
-                if self.q_far_apart(graph, proposed_color, node_tag):
+                # Get the tube tag and frame index of current node
+                tube_tag, frame_id = node_tag.split(".")
+                # Check 2 conditions that lead to a decision of coloring proposed color to a node
+                condition1 = self.q_far_apart(graph, proposed_color, node_tag)
+                condition2 = (frame_id == "isolated") or (proposed_color > int(frame_id))
+
+                if condition1 and condition2:
                     # Verbose =======================
                     print(f"Coloring the node: {node_tag} to color: {proposed_color}")
                     # Verbose =======================
@@ -181,15 +187,14 @@ class GraphColoration:
                     pbar.update(1)
 
                     # Color all the node in the same tube
-                    tube_tag, frame_id = node_tag.split(".")
                     if frame_id == "isolated":
                         continue
 
                     for same_tube_frame_id, same_tube_node in graph.nodes[tube_tag].items():
+                        same_tube_node.color = proposed_color + int(same_tube_frame_id) - int(frame_id)
                         # Verbose =======================
                         print(f"Coloring in the same tube - id: {same_tube_frame_id} to color: {same_tube_node.color}")
                         # Verbose =======================
-                        same_tube_node.color = proposed_color + int(same_tube_frame_id) - int(frame_id)
                         pbar.update(1)
             proposed_color += 1
         pbar.close()
