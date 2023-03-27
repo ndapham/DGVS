@@ -125,19 +125,17 @@ class GraphColoration:
                 return False
         return True
 
-    # def does_not_overlap(self, proposed_color, nodekey):
-    #     """
-    #     Condition 2 in He et al. 2017 paper which imposed a strict rule to avoid collisions
-    #     However, Ruan et al. 2019 not define the Overlapping relation so this is unnecessary
-    #     but i still copy the code for implementing that condition below and comment it
-    #     """
-    #     if pcg.generated_by_intersection(nodekey) or pcg.isolated_main_node(nodekey):
-    #         return True
-    #     vi, vj, vip, vjp = pcg.identify_quatern(nodekey)
-    #     vi, vj, vip, vjp = pcg.node(vi), pcg.node(vj), pcg.node(vip), pcg.node(vjp)
-    #     if vip.color is None or vjp.color is None: return True
-    #     tij = vj.frame - vi.frame
-    #     return (proposed_color - vip.color) * (proposed_color + tij - vjp.color) > 0
+    def not_overlap(self, graph: RuanGraph, proposed_color, node_tag):
+        """
+        Check whether we assign a color to node refer by node tag
+        other nodes in the same tube break the q far apart rule or not
+        """
+        tube_tag, frame_id = node_tag.split(".")
+        for same_tube_frame_id, same_tube_node in graph.nodes[tube_tag].items():
+            same_tube_propose_color = proposed_color + int(same_tube_frame_id) - int(frame_id)
+            if not self.q_far_apart(graph, same_tube_propose_color, same_tube_node.tag):
+                return False
+        return True
 
     @staticmethod
     def ssort(graph: RuanGraph, nodes_saturation):
@@ -162,8 +160,10 @@ class GraphColoration:
         pbar = tqdm(total=len(graph.list_node_tags))
 
         while len(graph.uncolored_nodes()) > 0:
-            print("Num uncolored nodes: ", len(graph.uncolored_nodes()))
-            nodes_not_colored = graph.uncolored_nodes()
+            # # Verbose =======================
+            # print("Num uncolored nodes: ", len(graph.uncolored_nodes()))
+            # # Verbose =======================
+            nodes_not_colored: list = graph.uncolored_nodes()
             nodes_saturation = self.saturation_cache.nodes_saturation(nodes_not_colored)
 
             order_list = self.ssort(graph, nodes_saturation)
@@ -175,13 +175,13 @@ class GraphColoration:
                 # Get the tube tag and frame index of current node
                 tube_tag, frame_id = node_tag.split(".")
                 # Check 2 conditions that lead to a decision of coloring proposed color to a node
-                condition1 = self.q_far_apart(graph, proposed_color, node_tag)
+                condition1 = self.not_overlap(graph, proposed_color, node_tag)
                 condition2 = (frame_id == "isolated") or (proposed_color > int(frame_id))
 
                 if condition1 and condition2:
-                    # Verbose =======================
-                    print(f"Coloring the node: {node_tag} to color: {proposed_color}")
-                    # Verbose =======================
+                    # # Verbose =======================
+                    # print(f"Coloring the node:{node_tag} to color:{proposed_color}")
+                    # # Verbose =======================
 
                     graph.get_node_by_nodetag(node_tag).color = proposed_color
                     pbar.update(1)
@@ -192,9 +192,9 @@ class GraphColoration:
 
                     for same_tube_frame_id, same_tube_node in graph.nodes[tube_tag].items():
                         same_tube_node.color = proposed_color + int(same_tube_frame_id) - int(frame_id)
-                        # Verbose =======================
-                        print(f"Coloring in the same tube - id: {same_tube_frame_id} to color: {same_tube_node.color}")
-                        # Verbose =======================
+                        # # Verbose =======================
+                        # print(f"Coloring in the same tube - id:{same_tube_frame_id} to color:{same_tube_node.color}")
+                        # # Verbose =======================
                         pbar.update(1)
             proposed_color += 1
         pbar.close()

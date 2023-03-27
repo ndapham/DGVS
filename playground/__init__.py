@@ -58,4 +58,4 @@ def create_tubes(list_tubes, duplicate=1):
     return tubes
 
 
-playground_tubes = create_tubes(list_tubes * 5)
+playground_tubes = create_tubes(list_tubes * 50)

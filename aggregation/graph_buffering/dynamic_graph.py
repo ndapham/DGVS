@@ -28,7 +28,6 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         self.tubes_buffer = tubes
 
         while len(self.tubes_buffer):
-            print([tube.tag for tube in self.tubes_buffer])
             # Push a tube from buffer to process
             self.tubes_in_process.append(self.tubes_buffer[0])
             self.tubes_buffer = self.tubes_buffer[1:]
@@ -74,11 +73,6 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         """
         Remove the tube with minimum starting time then stitch it to the output video
         """
-        # Verbose ============================================
-        print("=" * 50)
-        for tube in self.graph.tubes:
-            print(f'tube: {tube.tag} - color: {tube.color}')
-        # Verbose ============================================
         # Sort to get the tube with the minimum starting time to remove it
         tmp: List[Tube]  # tmp is the sorted list of tubes
         tmp = sorted(self.graph.tubes, key=lambda in_prog_tube: in_prog_tube.color)
@@ -129,23 +123,27 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         Adding method described by Ruan et al. 2019
         """
         # TODO: Define NC as a list or a dict? how to manage memory if number_of_collisions as a list
+        number_of_collisions = dict()
+
         # Try to place the new tube in the available graph
         c_tmp: int = 0
         for a_index, a_data in enumerate(new_tube):
             for potential_collision_tube in (self.output_tubes + self.graph.tubes):
                 for b_index, b_data in enumerate(potential_collision_tube):
                     if frame_intersect(a_data, b_data):
-                        c_tmp = self.get_color(potential_collision_tube, b_index) - a_index + 1
+                        c_tmp = self.get_color(potential_collision_tube, b_index) - a_index
                     if c_tmp >= 0:
-                        self.number_of_collisions[c_tmp] = self.number_of_collisions.get(c_tmp, 0) + 1
+                        number_of_collisions[c_tmp] = number_of_collisions.get(c_tmp, 0) + 1
 
         # Color the new tube based on the list of available places
         color = self.c_min
+
         while 1:
-            if self.number_of_collisions.get(color, 0) <= self.h:
+            if number_of_collisions.get(color, 0) < self.h:
                 new_tube.color = color
                 break
             color += 1
+
         # Add new tube to available graph to create new graph G(t+1)
         self.graph.tubes.append(new_tube)
         return self.graph
