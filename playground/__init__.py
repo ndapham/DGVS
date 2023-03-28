@@ -1,4 +1,23 @@
+import random
 from extraction import Tube
+
+
+def create_tubes(list_tubes, duplicate=1):
+    """
+    Convert tube from dictionary to Tube type
+    """
+    tubes = []
+    list_tubes = list_tubes * duplicate
+    for index, tube in enumerate(list_tubes):
+        tag = index
+        s_frame = list(tube.keys())[0]
+        e_frame = list(tube.keys())[-1]
+        tmp_tube = Tube(tag, s_frame, e_frame)
+        tubes.append(tmp_tube)
+        for r in tube.values():
+            tmp_tube.next_bounding_box(r[0], r[1], r[2], r[3])
+    return tubes
+
 
 # Define 4 tubes as examples
 tube1 = {
@@ -39,23 +58,5 @@ tube4 = {
 }
 
 list_tubes = [tube1, tube2, tube3, tube4]
-
-
-def create_tubes(list_tubes, duplicate=1):
-    """
-    Convert tube from dictionary to Tube type
-    """
-    tubes = []
-    list_tubes = list_tubes * duplicate
-    for index, tube in enumerate(list_tubes):
-        tag = index
-        s_frame = list(tube.keys())[0]
-        e_frame = list(tube.keys())[-1]
-        tmp_tube = Tube(tag, s_frame, e_frame)
-        tubes.append(tmp_tube)
-        for r in tube.values():
-            tmp_tube.next_bounding_box(r[0], r[1], r[2], r[3])
-    return tubes
-
-
-playground_tubes = create_tubes(list_tubes * 50)
+playground_tubes = create_tubes(list_tubes * 10)
+random.shuffle(playground_tubes)

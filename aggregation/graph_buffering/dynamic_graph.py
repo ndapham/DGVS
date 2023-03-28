@@ -114,9 +114,38 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         adjusting_end_time_location = tmp_graph2.get_end_time_location()
 
         # Update graph
+        if adding_end_time_location <= adjusting_end_time_location:
+            print(f"Adding: {adding_end_time_location} - adjusting: {adjusting_end_time_location}", )
+        else:
+            print(f"Adjusting: {adjusting_end_time_location} - adding: {adding_end_time_location}")
         self.graph = tmp_graph1 if adding_end_time_location <= adjusting_end_time_location else tmp_graph2
 
         return self.graph
+
+    def get_min_available_color(self, new_tube, list_available_tube):
+        """
+        Find the min suitable color for new tube while avoiding collisions with others
+        in list of available tubes
+        """
+        number_of_collisions = dict()
+
+        # Try to place the new tube in the available graph
+        c_tmp: int = 0
+        for a_index, a_data in enumerate(new_tube):
+            for potential_collision_tube in (self.output_tubes + self.graph.tubes):
+                for b_index, b_data in enumerate(potential_collision_tube):
+                    if frame_intersect(a_data, b_data):
+                        c_tmp = self.get_color(potential_collision_tube, b_index) - a_index
+                    if c_tmp >= 0:
+                        number_of_collisions[c_tmp] = number_of_collisions.get(c_tmp, 0) + 1
+
+        # Color the new tube based on the list of available places
+        color = self.c_min
+
+        while 1:
+            if number_of_collisions.get(color, 0) < self.h:
+                return color
+            color += 1
 
     def adding(self, new_tube: Tube):
         """
@@ -155,8 +184,12 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         # Initialize a queue for adjusting
         queue = []
 
-        # Put new tube at time location of c_min
-        new_tube.color = self.c_min
+        # Put new tube at the minimum available time location
+        # In the paper, Ruan et al. described that new_tube.color = self.c_min
+        # however, that may lead to collisions by new tube with previous tubes
+        # Here we fine the min available value as in adding method
+        new_tube.color = self.get_min_available_color(new_tube, self.output_tubes)
+
         # Check if new_tube collide with tube in progress
         for potential_collide_tube in self.graph.tubes:
             is_collided_flag = False

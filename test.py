@@ -11,4 +11,3 @@ pprint.pprint(f'Num of tubes in testing: {len(stress_test_tubes)}')
 dynamic_graph.run_pipeline(stress_test_tubes)
 for tube in dynamic_graph.output_tubes:
     pprint.pprint(f'tube_id:{tube.tag} - color:{tube.color}')
-    
