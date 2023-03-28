@@ -1,4 +1,3 @@
-import pprint
 from typing import List
 import copy
 
@@ -132,7 +131,7 @@ class RuanDynamicGraph(AbstractDynamicGraph):
         # Try to place the new tube in the available graph
         c_tmp: int = 0
         for a_index, a_data in enumerate(new_tube):
-            for potential_collision_tube in (self.output_tubes + self.graph.tubes):
+            for potential_collision_tube in list_available_tube:
                 for b_index, b_data in enumerate(potential_collision_tube):
                     if frame_intersect(a_data, b_data):
                         c_tmp = self.get_color(potential_collision_tube, b_index) - a_index

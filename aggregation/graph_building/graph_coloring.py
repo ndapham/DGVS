@@ -131,6 +131,8 @@ class GraphColoration:
         other nodes in the same tube break the q far apart rule or not
         """
         tube_tag, frame_id = node_tag.split(".")
+        if frame_id == "isolated":
+            return True
         for same_tube_frame_id, same_tube_node in graph.nodes[tube_tag].items():
             same_tube_propose_color = proposed_color + int(same_tube_frame_id) - int(frame_id)
             if not self.q_far_apart(graph, same_tube_propose_color, same_tube_node.tag):

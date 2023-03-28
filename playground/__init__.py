@@ -1,21 +1,37 @@
 import random
 from extraction import Tube
 
+# Hyper-parameters
+shuffle = True
+duplicate = 30
+n_times_tubes = 10
+
 
 def create_tubes(list_tubes, duplicate=1):
     """
     Convert tube from dictionary to Tube type
     """
     tubes = []
-    list_tubes = list_tubes * duplicate
     for index, tube in enumerate(list_tubes):
         tag = index
         s_frame = list(tube.keys())[0]
         e_frame = list(tube.keys())[-1]
+        if duplicate > 1:
+            e_frame = (e_frame - s_frame) * duplicate + s_frame
         tmp_tube = Tube(tag, s_frame, e_frame)
         tubes.append(tmp_tube)
-        for r in tube.values():
-            tmp_tube.next_bounding_box(r[0], r[1], r[2], r[3])
+
+        for i in range(duplicate):
+            if i % 2 == 0:
+                for r in tube.values():
+                    tmp_tube.next_bounding_box(r[0], r[1], r[2], r[3])
+            else:
+                tmp_bboxes = []
+                for r in tube.values():
+                    tmp_bboxes.append([r[0], r[1], r[2], r[3]])
+                tmp_bboxes.reverse()
+                for data in tmp_bboxes:
+                    tmp_tube.next_bounding_box(data[0], data[1], data[2], data[3])
     return tubes
 
 
@@ -58,5 +74,7 @@ tube4 = {
 }
 
 list_tubes = [tube1, tube2, tube3, tube4]
-playground_tubes = create_tubes(list_tubes * 10)
-random.shuffle(playground_tubes)
+playground_tubes = create_tubes(list_tubes * n_times_tubes, duplicate)
+
+if shuffle:
+    random.shuffle(playground_tubes)
