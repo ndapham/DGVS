@@ -3,6 +3,11 @@ from PIL import Image
 
 
 def frame_intersect(src_frame_data, trg_frame_data):
+    """
+    In this function,
+    src_frame_data is coordinate of object and frame index that it appears in source tube
+    trg_frame_data is coordinate of object and frame index that it appears in target tube
+    """
     src_x, src_y, src_w, src_h, _ = src_frame_data
     trg_x, trg_y, trg_w, trg_h, _ = trg_frame_data
 

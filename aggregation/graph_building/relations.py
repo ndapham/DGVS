@@ -1,7 +1,7 @@
 from abc import ABC
 from itertools import permutations
 from tqdm import tqdm
-
+import json
 
 class AbstractRelations(ABC):
     def __init__(self, tubes):
@@ -17,6 +17,9 @@ class AbstractRelations(ABC):
 
     def compute_relations(self):
         raise Exception("Using default compute relations function")
+
+    def save_as_json_dict(self, save_json_path):
+        raise Exception("Using default save as json function..")
 
 
 class RuanRelationsMap(AbstractRelations):
@@ -34,6 +37,11 @@ class RuanRelationsMap(AbstractRelations):
             self.compute_relations_by_matrix()
         else:
             self.compute_relations_by_loops()
+
+    def save_as_json_dict(self, save_json_path):
+        with open(save_json_path, "w") as f:
+            json.dump(self.relations_dict, f, indent=2)
+        return self.relations_dict
 
     # Compute relations among tubes using loops
     def compute_relations_by_loops(self):
