@@ -1,4 +1,4 @@
-# Dynamic Graph Video Synopsis
+# Dynamic Graph Coloring Video Synopsis
 A method using dynamic graph to solve the task of video synopsis
 
 This is my implementation. 
