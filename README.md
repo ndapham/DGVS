@@ -28,7 +28,7 @@ Video synopsis has specific applications in the field of video analytics and vid
 
 **This is my implementation:**
 
-- It's mostly inspired by what I read from [this paper]("assets/papers/ruan_dynamic_graph_coloring.pdf") by Ruan et al and a few related ones. 
+- It's mostly inspired by what I read from [this paper](https://github.com/ndapham/DGVS/blob/main/assets/papers/ruan_dynamic_graph_coloring.pdf) by Ruan et al and a few related ones. 
 - I added a few small adjustments hoping it would work better with the data I’m using.
 - I filled in the gaps with some guesswork and imagination — and yeah, it doesn’t really work well yet.  
 
@@ -50,7 +50,7 @@ It *technically* works now, but the result isn’t as smooth as I was hoping.
 There could be a few reasons for that:
 - Maybe there’s a logic bug somewhere that I haven’t caught yet.
 - Could also be because of the hyperparameter settings.
-- And lastly, some interruptions in object extraction might be causing the tubes to be a bit choppy — you can see it in the [output video]("./assets/synopsis.avi") with glitches like flickering and ghosting.
+- And lastly, some interruptions in object extraction might be causing the tubes to be a bit choppy — you can see it in the [output video](https://github.com/ndapham/DGVS/blob/main/assets/synopsis.avi) with glitches like flickering and ghosting.
 
 ---
 
