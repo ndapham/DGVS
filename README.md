@@ -43,7 +43,7 @@ I’ve got a full draft done, but there are still a couple of issues with colori
 
 ---
 
-**✅ Update May 2023**
+**✅ Update April 2023**
 
 It *technically* works now, but the result isn’t as smooth as I was hoping.
 
